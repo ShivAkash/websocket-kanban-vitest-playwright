@@ -10,6 +10,7 @@ const io = new Server(server, {
     origin: [
       "https://websocket-kanban-vitest-playwright-eight.vercel.app",
       "https://websocket-kanban-client.vercel.app",
+      "https://websocket-kanban-vitest-playwright-s796.vercel.app",
       "http://localhost:5173"  // Keep local development working
     ],
     methods: ["GET", "POST", "PUT", "OPTIONS"],
