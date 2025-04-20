@@ -7,8 +7,8 @@ import TaskForm from './TaskForm';
 import TaskProgressChart from './TaskProgressChart';
 import './styles.css';
 
-// Create socket instance only if not provided
-const createSocket = () => io('http://localhost:5000');
+
+const createSocket = () => io(import.meta.env.VITE_API_URL || 'http://localhost:5000');
 
 function KanbanBoard({ socket = createSocket() }) {
   const [tasks, setTasks] = useState({

@@ -1,22 +1,28 @@
 const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
+require('dotenv').config();
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, { cors: { origin: "*" } });
+const io = new Server(server, {
+  cors: {
+    origin: process.env.FRONTEND_URL || "*",
+    methods: ["GET", "POST"]
+  }
+});
 
-// In-memory storage for tasks
+// storage for tasks
 let tasks = {
   todo: [],
   inProgress: [],
   done: []
 };
 
-// Valid column names
+
 const validColumns = ['todo', 'inProgress', 'done'];
 
-// Helper function to find task by ID
+// find task by id
 const findTaskById = (taskId) => {
   for (const column in tasks) {
     const task = tasks[column].find(t => t.id === taskId);
@@ -25,7 +31,7 @@ const findTaskById = (taskId) => {
   return null;
 };
 
-// Helper function to normalize column name
+// normalize column name
 const normalizeColumnName = (status) => {
   if (status === 'inprogress') return 'inProgress';
   return status;
@@ -34,7 +40,7 @@ const normalizeColumnName = (status) => {
 io.on("connection", (socket) => {
   console.log("A user connected");
 
-  // Send all tasks to newly connected client
+  
   socket.emit("sync:tasks", tasks);
 
   // Create a new task
@@ -56,10 +62,10 @@ io.on("connection", (socket) => {
     console.log("Received task update:", { taskId, updatedTask });
     const found = findTaskById(taskId);
     if (found) {
-      // Remove from current column
+      
       tasks[found.column] = tasks[found.column].filter(t => t.id !== taskId);
       
-      // Normalize and validate the new column name
+      
       const newColumn = normalizeColumnName(updatedTask.status || found.column);
       
       if (!validColumns.includes(newColumn)) {
@@ -67,7 +73,7 @@ io.on("connection", (socket) => {
         return;
       }
 
-      // Add to new column
+      
       tasks[newColumn].push({
         ...found.task,
         ...updatedTask,
@@ -105,4 +111,5 @@ io.on("connection", (socket) => {
   });
 });
 
-server.listen(5000, () => console.log("Server running on port 5000"));
+const PORT = process.env.PORT || 5000;
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
