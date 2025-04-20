@@ -1,13 +1,53 @@
-import { render, screen } from "@testing-library/react";
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+import KanbanBoard from '../../components/KanbanBoard';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import { io } from 'socket.io-client';
+import { vi } from 'vitest';
 
-import KanbanBoard from "../../components/KanbanBoard";
+// Mock socket.io-client
+vi.mock('socket.io-client', () => ({
+  io: vi.fn().mockReturnValue({
+    on: vi.fn(),
+    emit: vi.fn(),
+    off: vi.fn(),
+    disconnect: vi.fn()
+  })
+}));
 
-// mock socket.io-client library
+describe('WebSocket Integration', () => {
+  let mockSocket;
 
-test("WebSocket receives task update", async () => {
-  render(<KanbanBoard />);
+  beforeEach(() => {
+    mockSocket = {
+      on: vi.fn(),
+      emit: vi.fn(),
+      off: vi.fn(),
+      disconnect: vi.fn()
+    };
+    vi.mocked(io).mockReturnValue(mockSocket);
+  });
 
-  expect(screen.getByText("Kanban Board")).toBeInTheDocument();
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
+  test("WebSocket receives task update", async () => {
+    const mockSocket = {
+      on: vi.fn(),
+      emit: vi.fn(),
+      off: vi.fn(),
+      disconnect: vi.fn()
+    };
+
+    render(
+      <DndProvider backend={HTML5Backend}>
+        <KanbanBoard socket={mockSocket} />
+      </DndProvider>
+    );
+
+    expect(screen.getByText('Create New Task')).toBeInTheDocument();
+  });
 });
 
-// TODO: Add more integration tests
