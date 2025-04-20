@@ -7,8 +7,13 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: process.env.FRONTEND_URL || "*",
-    methods: ["GET", "POST"]
+    origin: [
+      "https://websocket-kanban-vitest-playwright-eight.vercel.app",
+      "https://websocket-kanban-client.vercel.app",
+      "http://localhost:5173"  // Keep local development working
+    ],
+    methods: ["GET", "POST", "PUT", "OPTIONS"],
+    credentials: true
   }
 });
 

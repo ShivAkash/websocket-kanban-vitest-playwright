@@ -8,7 +8,12 @@ import TaskProgressChart from './TaskProgressChart';
 import './styles.css';
 
 
-const createSocket = () => io(import.meta.env.VITE_API_URL || 'http://localhost:5000');
+const createSocket = () => io(import.meta.env.VITE_API_URL || 'http://localhost:5000', {
+  withCredentials: true,
+  transports: ['websocket', 'polling'],
+  reconnectionAttempts: 5,
+  reconnectionDelay: 1000
+});
 
 function KanbanBoard({ socket = createSocket() }) {
   const [tasks, setTasks] = useState({
